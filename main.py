@@ -1,46 +1,48 @@
-def display_board(board):  # создать игровое поле
+def display_board(board):
     for row in board:
         print("|".join(row))
 
 
-def check_winner(board):  # проверить, есть ли победитель
-    for i in range(1, 4):
-        if board[i][1] == board[i][2] == board[i][3] != ' ' or \
-           board[1][i] == board[2][i] == board[3][i] != ' ':
+def check_winner(board, player):
+    for i in range(1, len(board)):
+        if all(board[i][j] == player for j in range(1, len(board[i]))) or \
+           all(board[j][i] == player for j in range(1, len(board[i]))):  # проверить ряд и столбец
             return True
-        if board[1][1] == board[2][2] == board[3][3] != ' ' or \
-           board[1][3] == board[2][2] == board[3][1] != ' ':
+
+        if all(board[i][i] == player for i in range(1, len(board))) or \
+           all(board[i][len(board) - i] == player for i in range(1, len(board))):  # проверить диагонали
             return True
     return False
 
 
-def full_board(board):  # проверить свободные ячейки
+def full_board(board):
     for row in board:
         if ' ' in row:
             return False
     return True
 
 
-def initialize_game():  # запуск игры
-    board = [[' ' for _ in range(4)] for _ in range(4)]
-    for i in range(1, 4):
+def initialize_game():
+    board_size = int(input("Укажите размер игрового поля (например, 2, 3, 4, т.д клетки): "))
+    board = [[' ' for _ in range(board_size + 1)] for _ in range(board_size + 1)]
+    for i in range(1, board_size + 1):
         board[0][i] = str(i-1)
         board[i][0] = str(i-1)
     current_player = 'X'
-
     while True:
         display_board(board)
         print(f"Ход игрока '{current_player}'")
-        row = int(input("Выберите ряд 0, 1, или 2: "))
-        col = int(input("Выберите столбец 0, 1, или 2: "))
-        while row < 0 or row > 2 or col < 0 or col > 2:
+        row = int(input("Выберите ряд: "))
+        col = int(input("Выберите столбец: "))
+        while row < 0 or row > board_size or col < 0 or col > board_size:
             print("Ошибка ввода. Повторите ещё раз.")
-            row = int(input("Выберите ряд 0, 1, или 2: "))
-            col = int(input("Выберите столбец 0, 1, или 2: "))
+            display_board(board)
+            row = int(input("Выберите ряд: "))
+            col = int(input("Выберите столбец: "))
             continue
         if board[row+1][col+1] == ' ':
             board[row+1][col+1] = current_player
-            if check_winner(board):
+            if check_winner(board, current_player):
                 display_board(board)
                 print(f"Игрок '{current_player}' выиграл!")
                 break
